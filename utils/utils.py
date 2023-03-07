@@ -944,16 +944,6 @@ def butter_lowpass_filtfilt(data, cutoff=1500, fs=50000, order=5):
     b, a = butter_lowpass(cutoff, fs, order=order)
     return filtfilt(b, a, data)  # forward-backward filter
 
-def change_cv2_draw(image,strs,local,sizes,colour):
-    cv2img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    pilimg = Image.fromarray(cv2img)
-    draw = ImageDraw.Draw(pilimg)  # 图片上打印
-    # font = ImageFont.truetype("./data/simhei.ttf",sizes, encoding="utf-8")
-    # draw.text((0,0),strs,colour,font=font)
-    font = ImageFont.truetype("simsun.ttc", 32, encoding="unic")
-    draw.text(local, strs, 'white', font=font)
-    image = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
-    return image
 def plot_one_box(x, img, color=None, label=None, line_thickness=None):
     # Plots one bounding box on image img
     tl = line_thickness or round(0.002 * (img.shape[0] + img.shape[1]) / 2) + 1  # line/font thickness
@@ -961,13 +951,12 @@ def plot_one_box(x, img, color=None, label=None, line_thickness=None):
     c1, c2 = (int(x[0]), int(x[1])), (int(x[2]), int(x[3]))
     cv2.rectangle(img, c1, c2, color, thickness=tl, lineType=cv2.LINE_AA)
     if label:
-        tf = max(tl - 1, 1)  # font thickness
+        tf = max(tl, 2)  # font thickness
         t_size = cv2.getTextSize(label, 0, fontScale=tl / 3, thickness=tf)[0]
         c2 = c1[0] + t_size[0], c1[1] - t_size[1] - 3
         cv2.rectangle(img, c1, c2, color, -1, cv2.LINE_AA)  # filled
-        # cv2.putText(img, label, (c1[0], c1[1] - 2), 0, tl / 3, [225, 255, 255], thickness=tf, lineType=cv2.LINE_AA)
-        image=change_cv2_draw(img,label,(int(c1[0]), int(c1[1]) - 30),5,[225,225,225])
-    return image
+        cv2.putText(img, label, (c1[0], c1[1]), 0, tl / 3, [255, 255, 255], thickness=tf-1, lineType=cv2.LINE_AA)
+    return img
 def plot_wh_methods():  # from utils.utils import *; plot_wh_methods()
     # Compares the two methods for width-height anchor multiplication
     # https://github.com/ultralytics/yolov3/issues/168
